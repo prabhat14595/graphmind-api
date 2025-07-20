@@ -34,7 +34,7 @@ graphmind-api/
 ├── requirements.txt   # Python dependencies
 └── README.md          # You’re here
 ```
-
+![Flow Diagram](./app/asset/images/flow.png)
 ---
 
 ## 🧩 Prerequisites
@@ -74,7 +74,8 @@ OPENROUTER_API_KEY=sk-or-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ## ▶️ Run the Project
 
 ```bash
-uvicorn main:app --reload --port 8011
+uvicorn main:app --reload --port 8015
+python3 -m uvicorn main:app --reload --port 8015
 ```
 
 Visit 👉 http://127.0.0.1:8011/docs to try out the `/chat` API!
@@ -139,3 +140,170 @@ MIT License © 2025 [Your Name]
 ---
 
 🧠 *“From zero to graph-based AI with LangGraph. Let’s build!”*
+
+# 🤖 GraphMind API
+
+A beginner-friendly FastAPI project using **LangGraph**, **OpenRouter**, and **LangChain** to build an intelligent conversational API with support for Open Source LLMs like DeepSeek.
+
+---
+
+## 📌 Features
+
+* 💬 Conversational chat endpoint (`/chat?user_input=Hello`)
+* 🧠 LangGraph-powered state machine to manage conversation flow
+* 🔓 Uses Open Source & Free LLMs via OpenRouter
+* ✅ Secure key management with `.env`
+* 🛡️ GitHub Push Protection integrated
+
+---
+
+## 📁 Project Structure
+
+```bash
+graphmind-api/
+├── app/
+│   ├── nodes.py        # LLM logic (uses OpenRouter)
+│   └── state.py        # Shared graph state (chat history)
+├── main.py             # FastAPI app with /chat endpoint
+├── .env                # Secret key (not committed)
+├── .gitignore          # Protects secrets & virtualenv
+├── README.md           # This file
+└── assets/             # Diagrams & screenshots
+```
+
+---
+
+## 🚀 How to Run
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/your-username/graphmind-api.git
+cd graphmind-api
+```
+
+### 2. Create Virtual Environment
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+### 3. Install Requirements
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Setup Environment Variables
+
+Create a `.env` file:
+
+```env
+OPENROUTER_API_KEY=your-key-here
+```
+
+### 5. Run the Server
+
+```bash
+uvicorn main:app --reload
+```
+
+Visit: `http://127.0.0.1:8000/docs` to try the `/chat` endpoint.
+
+---
+
+
+## 🔄 Code Flow Explained
+
+### 1. `main.py`
+
+* Starts a FastAPI app
+* Builds a LangGraph from `generate_response`
+* Calls `graph.invoke()` with user input
+
+```python
+@app.post("/chat")
+def chat(user_input: str):
+    state = GraphState(messages=[{"role": "user", "content": user_input}])
+    final_state = graph.invoke(state)
+    return {"response": final_state.messages[-1]["content"]}
+```
+
+### 2. `app/state.py`
+
+Defines the state type that moves across graph steps.
+
+```python
+class GraphState(TypedDict):
+    messages: list[dict]  # Chat history
+```
+
+### 3. `app/nodes.py`
+
+Initializes the LLM client using OpenRouter.
+
+```python
+llm = ChatOpenAI(
+    model="deepseek-chat",
+    api_key=os.getenv("OPENROUTER_API_KEY"),
+    base_url="https://openrouter.ai/api/v1"
+)
+
+def generate_response(state: GraphState) -> GraphState:
+    messages = state["messages"]
+    response = llm.invoke(messages)
+    messages.append({"role": "assistant", "content": response.content})
+    return {"messages": messages}
+```
+
+### 4. LangGraph Setup
+
+```python
+builder = Graph()
+builder.add_node("chat", generate_response)
+builder.set_entry_point("chat")
+graph = builder.compile()
+```
+
+---
+
+## 📊 Visual Flow
+
+> Add to README:
+
+**High-Level:**
+
+```
+User Input ➔ /chat Endpoint ➔ GraphState ➔ LangGraph Node ➔ OpenRouter LLM ➔ Assistant Reply
+```
+
+**Low-Level:**
+
+```
+FastAPI
+    └─ GET /chat
+        └─ Create GraphState
+            └─ LangGraph.invoke()
+                └─ generate_response()
+                    └─ ChatOpenAI (via OpenRouter)
+                        └─ Returns response
+```
+
+---
+
+## 📦 Tech Stack
+
+* **FastAPI** - REST API Framework
+* **LangGraph** - Graph-based LLM orchestrator
+* **LangChain** - Abstraction layer for LLMs
+* **OpenRouter** - API gateway for multiple free and open-source LLMs
+* **DeepSeek** - Free, high-quality open LLM
+
+---
+
+## 🔐 Security & Best Practices
+
+* API keys stored in `.env` (never hard-coded)
+* `.gitignore` prevents leaking `.env` & `venv`
+* GitHub Push Protection blocks secrets
