@@ -74,7 +74,8 @@ OPENROUTER_API_KEY=sk-or-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ## ▶️ Run the Project
 
 ```bash
-uvicorn main:app --reload --port 8011
+uvicorn main:app --reload --port 8015
+python3 -m uvicorn main:app --reload --port 8015
 ```
 
 Visit 👉 http://127.0.0.1:8011/docs to try out the `/chat` API!
