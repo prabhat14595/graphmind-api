@@ -7,3 +7,9 @@ class ChatState(BaseModel):
     @staticmethod
     def init(user_input: str):
         return ChatState(messages=[{"role": "user", "content": user_input}])
+    
+
+class GraphState(BaseModel):
+    input: str
+    type: Optional[str] = None
+    response: Optional[str] = None
