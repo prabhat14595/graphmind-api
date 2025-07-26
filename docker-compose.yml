@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  # GraphMind AI Chat Application
+  graphmind-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: graphmind-ai-chat
+    ports:
+      - "8000:8000"
+    environment:
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - ENVIRONMENT=production
+    env_file:
+      - .env
+    volumes:
+      # Mount logs directory for persistence
+      - ./logs:/app/logs
+    restart: unless-stopped
+    networks:
+      - graphmind-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Optional: Nginx reverse proxy for production
+  nginx:
+    image: nginx:alpine
+    container_name: graphmind-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - graphmind-app
+    restart: unless-stopped
+    networks:
+      - graphmind-network
+    profiles:
+      - production
+
+networks:
+  graphmind-network:
+    driver: bridge
+
+volumes:
+  logs:
+    driver: local

@@ -7,10 +7,11 @@ from dotenv import load_dotenv
 load_dotenv()  # Loads .env into environme
 
 llm = ChatOpenAI(
-    model_name="deepseek/deepseek-r1-0528:free",
+    # deepseek/deepseek-chat-v3-0324:free
+    model_name="deepseek/deepseek-chat-v3-0324:free",  # Using free DeepSeek V3 model
     base_url="https://openrouter.ai/api/v1",
     openai_api_key=os.getenv("OPENROUTER_API_KEY"), #create a .env file with this key
-    max_tokens=5500  # Prevents exceeding token budget
+    max_tokens=2000  # Reduced for regular chat responses
     ) 
 
 def convert_messages(dict_messages):
