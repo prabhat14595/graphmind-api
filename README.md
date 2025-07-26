@@ -1,5 +1,7 @@
 # 🤖 GraphMind API – AI Chat with LangGraph + FastAPI
 
+https://graphmind-api.onrender.com -- Access it here.
+
 An open-source beginner-friendly AI chat project using **LangGraph**, **FastAPI**, and **OpenRouter (free GPT/OpenAI alternatives)**.
 
 ![GraphMind Banner](assets/banner.png)
