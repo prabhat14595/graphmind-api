@@ -42,4 +42,3 @@ langchain_logs/
 # Others
 *.log
 frontend/node_modules/
-frontend/build/
